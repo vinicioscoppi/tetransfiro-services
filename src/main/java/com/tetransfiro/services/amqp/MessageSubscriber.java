@@ -20,12 +20,10 @@ public class MessageSubscriber {
 
 	@RabbitListener(queues = { "${queue.purchase.name}" })
 	public void receive(@Payload String fileBody) {
-		
 		logger.debug("Received <{}>", fileBody);
-
+		
 		try {
 			messageService.handle(fileBody);
-			
 		} catch (JsonProcessingException e) {
 			logger.error(e.getMessage());
 		}

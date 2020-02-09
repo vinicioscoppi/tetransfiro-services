@@ -6,7 +6,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
@@ -26,10 +25,6 @@ public class HttpRequestService {
 
 	private Logger logger = LoggerFactory.getLogger(HttpRequestService.class);
 
-	public String sendSimpleHttpGetRequestTo(String url, CloseableHttpClient client) throws IOException {
-		return EntityUtils.toString(execute(new HttpGet(url), client));
-	}
-
 	public String sendAutheticatedPostRequestTo(String url,
 	                                            String entity,
 	                                            String user,
@@ -41,11 +36,12 @@ public class HttpRequestService {
 
 		httpPost.setEntity(new StringEntity(entity));
 		httpPost.addHeader(createAuthHeader(user, pwd, httpPost));
-		httpPost.setHeader(ACCEPT, APPLICATION_JSON);
-		httpPost.setHeader(CONTENT_TYPE, APPLICATION_JSON);
+		httpPost.addHeader(ACCEPT, APPLICATION_JSON);
+		httpPost.addHeader(CONTENT_TYPE, APPLICATION_JSON);
 
-		logger.debug("executing request {}", httpPost.getRequestLine());
-		return EntityUtils.toString(execute(httpPost, client));
+		logger.debug("Executing request {}", httpPost.getRequestLine());
+		var ent = execute(httpPost, client);
+		return EntityUtils.toString(ent);
 	}
 
 	private Header createAuthHeader(String user, String pwd, HttpPost httpPost) throws AuthenticationException {
@@ -53,6 +49,7 @@ public class HttpRequestService {
 	}
 
 	private HttpEntity execute(HttpRequestBase httpObject, CloseableHttpClient client) throws IOException {
-		return client.execute(httpObject).getEntity();
+		var resp = client.execute(httpObject);
+		return resp.getEntity();
 	}
 }
