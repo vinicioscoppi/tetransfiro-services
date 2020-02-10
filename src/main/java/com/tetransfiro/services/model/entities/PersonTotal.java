@@ -16,9 +16,6 @@ public class PersonTotal {
 	private String personFullName;
 
 	@NonNull
-	private String phone;
-
-	@NonNull
 	private String email;
 
 	@NonNull
